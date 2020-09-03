@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="_header :: header(~{::title})">
+  <title>/error</title>
+</head>
+<body class="bg-light">
+
+<th:block th:replace="_nav :: nav"/>
+
+<main role="main" class="container" style="padding-top: 100px;">
+
+  <div class="row">
+    <div class="card col-md-12 p-md-3">
+      <div class="card row col-md-12 m-md-2 px-md-2 py-md-4">
+
+        <div class="card-deck mb-md-3">
+          <div class="card">
+            <div class="card-header">timestamp</div>
+            <div class="card-body" th:text="${timestamp}"></div>
+          </div>
+          <div class="card">
+            <div class="card-header">status</div>
+            <div class="card-body" th:text="${status}"></div>
+          </div>
+          <div class="card">
+            <div class="card-header">error</div>
+            <div class="card-body" th:text="${error}"></div>
+          </div>
+        </div>
+        <div class="card col-md-12 px-0 mb-md-3">
+          <div class="card-header">exception</div>
+          <div class="card-body" th:text="${exception}"></div>
+        </div>
+        <div class="card col-md-12 px-0 mb-md-3">
+          <div class="card-header">message</div>
+          <div class="card-body" th:text="${message}"></div>
+        </div>
+        <div class="card col-md-12 px-0 mb-md-3">
+          <div class="card-header">errors</div>
+          <div class="card-body" th:text="${errors}"></div>
+        </div>
+        <div class="card col-md-12 px-0 mb-md-3">
+          <div class="card-header">trace</div>
+          <div class="card-body" th:text="${trace}"></div>
+        </div>
+        <div class="card col-md-12 px-0 mb-md-3">
+          <div class="card-header">path</div>
+          <div class="card-body" th:text="${path}"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

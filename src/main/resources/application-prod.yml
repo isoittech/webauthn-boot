@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:webauthn;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+logging.file: webauthn.log
+logging:
+  file:
+    max-size: 50MB
+    max-history: 10
+  level:
+    root: info
+    org.springframework: info
+    org.hibernate: info
+    org.hibernate.SQL: info
+    org.thymeleaf: info
+    org.thymeleaf.TemplateEngine.CONFIG: info
+    org.thymeleaf.TemplateEngine.TIMER: info
+    org.thymeleaf.TemplateEngine.cache.TEMPLATE_CACHE: info
+    com.example.demo: info

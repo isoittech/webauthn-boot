@@ -2,3 +2,15 @@
 
 = webauthn-boot
 Demo project for Spring Boot with WebAuthn, MyBatis and Thymeleaf
+
+== 参考
+
+=== 開発系
+
+* https://developer.mozilla.org/ja/docs/Web/API/Web_Authentication_API[Web Authentication API]
+* https://qiita.com/kawash/items/80b89437add0628af2a3[FIDO2（WebAuthn）に入門してみた - ユーザ登録編]
+* https://qiita.com/kawash/items/07b6059aa5da67fef759[FIDO2（WebAuthn）に入門してみた - ユーザ認証編]
+
+=== 環境系
+
+* https://recipe.kc-cloud.jp/archives/11084[AWSでWebサイトをHTTPS化 その1：ELB(+ACM発行証明書)→EC2編]

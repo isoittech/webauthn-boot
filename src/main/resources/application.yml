@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: Demo project for Spring Boot with WebAuthn, MyBatis and Thymeleaf
+  profiles:
+    active: local
+  output:
+    ansi:
+      enabled: detect
+  datasource:
+    url: jdbc:h2:mem:webauthn;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;
+    username: sa
+    password:
+#  jpa:
+#    open-in-view: true
+#    generate-ddl: true
+#    hibernate:
+#      ddl-auto: create-drop
+  jackson:
+    serialization:
+      indent-output: true
+      write-dates-as-timestamps: false
+      write-durations-as-timestamps: true
+  thymeleaf:
+    enabled: true
+    encoding: UTF-8
+    enable-spring-el-compiler: true
+    mode: html
+  devtools:
+    restart:
+      enabled: true
+      log-condition-evaluation-delta: true
+    livereload:
+      enabled: false
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+server:
+  port: 8181
+
+logging.file: webauthn.log
+logging:
+  file:
+    max-size: 50MB
+    max-history: 10
+  level:
+    root: info
+    org.springframework: info
+    org.hibernate: info
+    org.hibernate.SQL: debug
+    org.thymeleaf: debug
+    org.thymeleaf.TemplateEngine.CONFIG: trace
+    org.thymeleaf.TemplateEngine.TIMER: trace
+    org.thymeleaf.TemplateEngine.cache.TEMPLATE_CACHE: trace
+    com.example.demo: debug
