@@ -2,47 +2,73 @@
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="_header :: header(~{::title})">
   <title>User Register</title>
-  <!--  <meta name="webAuthnChallenge" th:content="${webAuthnChallenge}" content=""/>-->
-
 </head>
 <body class="bg-light">
 
 <th:block th:replace="_nav :: nav"/>
 
-<main role="main" class="container" style="padding-top: 100px;">
+<main role="main" class="container" style="padding-top: 50px;">
   <div class="py-5 text-center">
     <p th:if="${validationError}" class="alert alert-danger text-left" th:text="${validationError}">
       validation
       error</p>
   </div>
 
-  <div class="row">
-    <div class="card col-md-12 p-md-3">
-      <div class="card row col-md-6 m-md-2 px-md-2 py-md-4">
-        <form action="#" th:action="@{/webauthn/signup}" th:object="${userRegisterForm}"
-              method="post">
-          <!--          <input id="userHandle" name="userHandle" th:field="*{userHandle}" type="hidden"/>-->
-          <!-- email -->
-          <div class="col-md-9 mb-3">
-            <label class="control-label" for="email">Email </label>
-            <input id="email" type="email" class="form-control" th:field="*{email}"
-                   placeholder="you@example.com"/>
-            <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}"
-                 class="help-block alert alert-danger">
-              error
-            </div>
-          </div>
-
-          <button class="btn btn-primary btn-lg btn-block" type="submit">confirm</button>
+  <div id="webauthn-register-request" class="card">
+    <div class="card-header">
+      1. FIDO認証用情報を要求（ブラウザから認証サーバへ）
+    </div>
+    <div class="card-body">
+      <p class="card-text">認証サーバへFIDO認証用情報を要求し、チャレンジ等の情報を要求する。</p>
+      <div class="card p-3">
+        <form action="#">
+          <label class="control-label" for="email">Email </label>
+          <input id="email" type="email" class="form-control" placeholder="you@example.com"
+                 value="test@test.test"/>
+          <div id="emailValidationMessage"></div>
+          <button id="webauthn-register-request-btn" class="btn btn-primary mt-3" type="submit">
+            FIDO認証情報要求
+          </button>
         </form>
-
+      </div>
+      <div class="card mt-3 p-3">
+        <div class="form-group">
+          <label for="webauthn-register-response">レスポンス</label>
+          <textarea class="form-control auto-resize" id="webauthn-register-response" rows="3"
+                    readonly></textarea>
+        </div>
       </div>
     </div>
   </div>
 
-  <footer class="text-muted text-center text-small">
-    <p class="mb-1">&nbsp;</p>
-  </footer>
+  <div id="webauthn-register-response-container">
+    <input id="webauthn-register-response-json-raw" type="hidden"/>
+    <input id="cred-parameter-create-result-raw" type="hidden"/>
+  </div>
+
+  <div id="cred-parameter-create" class="card mt-5">
+    <div class="card-header">
+      2. 認証機との処理に使用するパラメータの作成
+    </div>
+    <div class="card-body">
+      <p class="card-text">認証サーバから取得したデータを元にnavigator.credentials.create()呼び出しに必要なパラメータを作成する。</p>
+      <div class="card p-3">
+        <form action="#">
+          <button id="cred-parameter-create-btn" class="btn btn-primary mt-2" type="submit">
+            認証機パラメータ作成
+          </button>
+        </form>
+      </div>
+      <div class="card mt-3 p-3">
+        <div class="form-group">
+          <label for="webauthn-register-response">結果</label>
+          <textarea class="form-control auto-resize" id="cred-parameter-create-result" rows="3"
+                    readonly></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <th:block th:replace="_include :: basic"/>
