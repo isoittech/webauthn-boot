@@ -1,3 +1,28 @@
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+// グローバル変数
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+// ブラウザAPI（認証器に対する公開鍵の生成要求）に渡すパラメータ
+var publicKeyCredentialCreationOptions_grobal;
+
+
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+// FIDO認証情報リクエスト処理
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+function base64ToBinary(base64Str){
+  /*
+   * BASE64をUint8Arrayに変換する
+   */
+  var binary = atob(base64Str);
+  var len = binary.length;
+  var bytes = new Uint8Array(len);
+  for (var i = 0; i < len; i++)        {
+    bytes[i] = binary.charCodeAt(i);
+  }
+
+  return bytes;
+}
+
+
 $(function(){
   console.log("≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡")
   console.log("onLoad処理開始")
@@ -46,33 +71,72 @@ $(function(){
     // ==========================================================
     //  認証機との処理に使用するパラメータの作成
     // ==========================================================
+    // TODO
+    // Windows Helloを認証機として使う場合の考慮事項
+    // https://docs.microsoft.com/ja-jp/microsoft-edge/dev-guide/windows-integration/web-authentication#windows-hello-%E3%81%AE%E7%89%B9%E5%88%A5%E3%81%AA%E8%80%83%E6%85%AE%E4%BA%8B%E6%96%87
     var publicKeyCredentialCreationOptions = {
-        challenge: window.atob(fidoAuthResp.challenge) + " ★TODO バイナリ変換",
-        rp: fidoAuthResp.rp,
+        challenge: base64ToBinary(fidoAuthResp.challenge),
+        challenge_base64: fidoAuthResp.challenge + " ★これをバイナリにしたのが'challenge'",
+        rp: {
+          name: fidoAuthResp.rp,
+          id: 'localhost'
+        },
         user: {
-            id: window.atob(fidoAuthResp.user.id) + " ★TODO バイナリ変換",
-            name: fidoAuthResp.user.name,
-            displayName: fidoAuthResp.user.displayName,
+          id: base64ToBinary(fidoAuthResp.user.id),
+          id_base64: fidoAuthResp.user.id + " ★これをバイナリにしたのが'user.id'",
+          name: fidoAuthResp.user.name,
+          displayName: fidoAuthResp.user.displayName,
         },
         attestation: fidoAuthResp.attestation,
-        pubKeyCredParams: [{
+        pubKeyCredParams: [
+          {
             type: 'public-key',
             alg: -7,
-        }],
+          },
+          {
+            //Windows Hello supports the RS256 algorithm
+            type: "public-key",
+            alg: -257
+          }
+        ],
         authenticatorSelection: {
-            authenticatorAttachment: 'cross-platform',
-            requireResidentKey: false,
-            userVerification: 'discouraged'
+          authenticatorAttachment: 'cross-platform',
+          requireResidentKey: true, // 認証機にユーザ情報を保存するか否か
+          userVerification: 'required' // required=ユーザ認証を行わせる
         }
     };
 
-    $("#cred-parameter-create-result-json-raw").val(JSON.stringify(publicKeyCredentialCreationOptions));
+    // ★重要★
+    // $("#cred-parameter-create-result-json-raw").val(JSON.stringify(publicKeyCredentialCreationOptions));
+    // 上記では、hiddenパラメータにブラウザAPIパラメータをJSON文字列にして保存している。
+    // それを、ブラウザAPIに渡す直前に、JSON文字列からオブジェクトに戻しても、
+    // そのオブジェクトをブラウザAPIに渡すとエラーを返されてしまう。
+    // TypeError: Failed to execute 'create' on
+    //   'CredentialsContainer': The provided value is not of
+    //   type '(ArrayBuffer or ArrayBufferView)'
+    // そのため、グローバルな領域に変数を定義し、そこへ保存することとする。
+    publicKeyCredentialCreationOptions_grobal = publicKeyCredentialCreationOptions;
     var textareaVal = JSON.stringify(publicKeyCredentialCreationOptions, null , "\t");
     $("#cred-parameter-create-result").val(textareaVal);
 
+    return false;
+  });
 
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+// navigator.credentials.create()呼び出し
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+  $("#cred-api-call-btn").on('click',function(){
+    // ==========================================================
+    //  ブラウザAPIを実行（認証器に対して公開鍵の生成要求）
+    // ==========================================================
+    var attestationObject = navigator.credentials.create({
+      publicKey: publicKeyCredentialCreationOptions_grobal
+    });
 
-    $("").val(fidoAuthResp);
+    $("#cred-api-call-result-json-raw").val(JSON.stringify(attestationObject));
+    var textareaVal = JSON.stringify(attestationObject, null , "\t");
+    $("#cred-api-call-result").val(textareaVal);
+
 
     return false;
   });
@@ -97,6 +161,15 @@ $(function(){
       }
     }
   });
+
+
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+// 画面上部へ遷移する機能
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+  $('.rightBottomFixed').click(function(){
+      $('html,body').animate({'scrollTop':0},500);
+  });
+
 
   console.log("≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡")
   console.log("onLoad処理完了")
