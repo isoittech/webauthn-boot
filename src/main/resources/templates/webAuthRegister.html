@@ -14,13 +14,13 @@
       error</p>
   </div>
 
-  <div id="webauthn-register-request" class="card">
+  <div id="webauthn-register-request" class="card shadow rounded">
     <div class="card-header">
-      1. FIDO認証用情報を要求（ブラウザから認証サーバへ）
+      <h5>1. FIDO認証用情報を要求（ブラウザから認証サーバへ）</h5>
     </div>
     <div class="card-body">
       <p class="card-text">認証サーバへFIDO認証用情報を要求し、チャレンジ等の情報を要求する。</p>
-      <div class="card p-3">
+      <div class="card p-3 shadow">
         <form action="#">
           <label class="control-label" for="email">Email </label>
           <input id="email" type="email" class="form-control" placeholder="you@example.com"
@@ -31,7 +31,7 @@
           </button>
         </form>
       </div>
-      <div class="card mt-3 p-3">
+      <div class="card mt-3 p-3 shadow">
         <div class="form-group">
           <label for="webauthn-register-response">レスポンス</label>
           <textarea class="form-control auto-resize" id="webauthn-register-response" rows="3"
@@ -43,26 +43,51 @@
 
   <div id="webauthn-register-response-container">
     <input id="webauthn-register-response-json-raw" type="hidden"/>
-    <input id="cred-parameter-create-result-raw" type="hidden"/>
+    <input id="cred-parameter-create-result-json-raw" type="hidden"/>
   </div>
 
-  <div id="cred-parameter-create" class="card mt-5">
+  <div id="cred-parameter-create" class="card mt-5 shadow rounded">
     <div class="card-header">
-      2. 認証機との処理に使用するパラメータの作成
+      <h5>2. 認証機との処理に使用するパラメータの作成</h5>
     </div>
     <div class="card-body">
       <p class="card-text">認証サーバから取得したデータを元にnavigator.credentials.create()呼び出しに必要なパラメータを作成する。</p>
-      <div class="card p-3">
+      <div class="card p-3 shadow">
         <form action="#">
           <button id="cred-parameter-create-btn" class="btn btn-primary mt-2" type="submit">
             認証機パラメータ作成
           </button>
         </form>
       </div>
-      <div class="card mt-3 p-3">
+      <div class="card mt-3 p-3 shadow">
         <div class="form-group">
           <label for="webauthn-register-response">結果</label>
           <textarea class="form-control auto-resize" id="cred-parameter-create-result" rows="3"
+                    readonly></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="cred-api-call" class="card mt-5 shadow rounded">
+    <div class="card-header">
+      <h5>3. navigator.credentials.create()呼び出し</h5>
+    </div>
+    <div class="card-body">
+      <p class="card-text">
+        ブラウザから認証機へアクセスするためのブラウザAPI（navigator.credentials.create()）を呼び出し、そのレスポンスを受け取る。</p>
+      <div class="card p-3 shadow">
+        <form action="#">
+          <button id="cred-api-call-btn" class="btn btn-primary mt-2" type="submit">
+            ブラウザAPI実行
+          </button>
+        </form>
+      </div>
+      <div class="card mt-3 p-3 shadow">
+        <div class="form-group">
+          <label for="webauthn-register-response">ブラウザAPI返却レスポンス</label>
+          <textarea class="form-control auto-resize" id="cred-api-call-result" rows="3"
                     readonly></textarea>
         </div>
       </div>

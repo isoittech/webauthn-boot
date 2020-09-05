@@ -66,7 +66,7 @@ $(function(){
         }
     };
 
-    $("#cred-parameter-create-result-raw").val(JSON.stringify(publicKeyCredentialCreationOptions));
+    $("#cred-parameter-create-result-json-raw").val(JSON.stringify(publicKeyCredentialCreationOptions));
     var textareaVal = JSON.stringify(publicKeyCredentialCreationOptions, null , "\t");
     $("#cred-parameter-create-result").val(textareaVal);
 
