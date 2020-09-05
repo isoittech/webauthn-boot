@@ -78,8 +78,8 @@ $(function(){
         challenge: base64ToBinary(fidoAuthResp.challenge),
         challenge_base64: fidoAuthResp.challenge + " ★これをバイナリにしたのが'challenge'",
         rp: {
-          name: fidoAuthResp.rp,
-          id: 'localhost'
+          name: fidoAuthResp.rp.name,
+          id: fidoAuthResp.rp.id
         },
         user: {
           id: base64ToBinary(fidoAuthResp.user.id),

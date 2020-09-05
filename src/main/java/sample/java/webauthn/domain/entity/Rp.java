@@ -1,4 +1,3 @@
-
 package sample.java.webauthn.domain.entity;
 
 import java.io.Serializable;
@@ -17,9 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-    "name"
-})
+@JsonPropertyOrder({"name"})
 @ToString
 @Data
 @Builder
@@ -27,11 +24,16 @@ import lombok.ToString;
 @NoArgsConstructor
 public class Rp implements Serializable {
 
+  @JsonProperty("id")
+  public String id;
+
   @JsonProperty("name")
   public String name;
+
   @JsonIgnore
   private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
-  private final static long serialVersionUID = 3099638393887893731L;
+
+  private static final long serialVersionUID = 3099638393887893731L;
 
   @JsonAnyGetter
   public Map<String, Object> getAdditionalProperties() {
@@ -47,5 +49,4 @@ public class Rp implements Serializable {
     this.additionalProperties.put(name, value);
     return this;
   }
-
 }

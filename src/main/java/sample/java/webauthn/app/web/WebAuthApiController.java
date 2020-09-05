@@ -1,5 +1,6 @@
 package sample.java.webauthn.app.web;
 
+import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,9 @@ public class WebAuthApiController {
 
   @PostMapping(value = "register", consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseData register(
-      @RequestBody UserRegisterRequestForm userRegisterRequestForm, BindingResult result) {
+      @RequestBody UserRegisterRequestForm userRegisterRequestForm,
+      BindingResult result,
+      HttpServletRequest request) {
 
     if (result.hasErrors()) {
       throw new RuntimeException("バリデーションエラー発生");
@@ -37,6 +40,7 @@ public class WebAuthApiController {
     if (userCreationOptions == null) {
       throw new RuntimeException();
     }
+    userCreationOptions.getRp().setId(request.getServerName());
 
     ResponseData responseData =
         new ResponseData().builder().status(HttpStatus.CREATED).data(userCreationOptions).build();
