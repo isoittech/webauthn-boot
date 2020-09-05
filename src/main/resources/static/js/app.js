@@ -100,6 +100,8 @@ $(function(){
           }
         ],
         authenticatorSelection: {
+          // platform: 認証機器がクライアントに接続されており、通常は取り外し不可能である
+          // cross-platform: 機器が異なるプラットフォームをまたがって使用される可能性があることを示す (USB や NFC 端末など)。
           authenticatorAttachment: 'cross-platform',
           requireResidentKey: true, // 認証機にユーザ情報を保存するか否か
           userVerification: 'required' // required=ユーザ認証を行わせる
