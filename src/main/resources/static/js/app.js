@@ -3,6 +3,8 @@
 // ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
 // ブラウザAPI（認証器に対する公開鍵の生成要求）に渡すパラメータ
 var publicKeyCredentialCreationOptions_grobal;
+// ブラウザAPI（認証器に対する公開鍵の生成要求）からの返却オブジェクト
+var attestationObject_grobal
 
 
 // ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
@@ -20,6 +22,13 @@ function base64ToBinary(base64Str){
   }
 
   return bytes;
+}
+
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+// バイナリ→Base64変換
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+function binaryToBase64(binaryObj){
+  return window.btoa(String.fromCharCode.apply(null, new Uint8Array(binaryObj)));
 }
 
 
@@ -124,6 +133,7 @@ $(function(){
     return false;
   });
 
+
 // ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
 // navigator.credentials.create()呼び出し
 // ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
@@ -131,14 +141,35 @@ $(function(){
     // ==========================================================
     //  ブラウザAPIを実行（認証器に対して公開鍵の生成要求）
     // ==========================================================
-    var attestationObject = navigator.credentials.create({
-      publicKey: publicKeyCredentialCreationOptions_grobal
+    navigator.credentials.create({
+        publicKey: publicKeyCredentialCreationOptions_grobal
+    })
+    .then((result) => {
+      var attestationObject_grobal = result;
+      console.log(attestationObject_grobal);
+
+      // ---------------------------------
+      // Textareaフォームに表示したいためだけの処理
+      // ---------------------------------
+      var attestationObject = {
+        PublicKeyCredential: {
+          id: attestationObject_grobal.id,
+          rawId: binaryToBase64(attestationObject_grobal.rawId)+ " ★実際はバイナリ",
+          response: {
+            attestationObject: binaryToBase64(attestationObject_grobal.response.attestationObject)+ " ★実際はバイナリ",
+            clientDataJSON: binaryToBase64(attestationObject_grobal.response.clientDataJSON)+ " ★実際はバイナリ",
+          },
+          type: attestationObject_grobal.type
+        }
+      };
+
+      var textareaVal = JSON.stringify(attestationObject, null , "\t");
+      $("#cred-api-call-result").val(textareaVal);
+    })
+    .catch((errorObj) => {
+      console.log(errorObj);
+      $("#cred-api-call-result").val("エラー発生");
     });
-
-    $("#cred-api-call-result-json-raw").val(JSON.stringify(attestationObject));
-    var textareaVal = JSON.stringify(attestationObject, null , "\t");
-    $("#cred-api-call-result").val(textareaVal);
-
 
     return false;
   });
