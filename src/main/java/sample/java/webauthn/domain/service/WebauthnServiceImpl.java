@@ -141,7 +141,7 @@ public class WebauthnServiceImpl implements WebauthnService {
     byte[] clientDataJSON =
         Base64.decodeBase64(validateCredentialDto.getResponse().getClientDataJSON());
     String userEmail = validateCredentialDto.getEmail();
-    Set<String> transports = new HashSet<>(Arrays.asList("usb", "nfc", "ble"));
+    Set<String> transports = new HashSet<>(Arrays.asList("usb", "nfc", "ble", "internal"));
 
     // --------------------------------------
     // Server properties
