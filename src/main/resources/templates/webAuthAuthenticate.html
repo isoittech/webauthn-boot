@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="_header :: header(~{::title})">
+  <title>User Register</title>
+</head>
+<body class="bg-light">
+
+<th:block th:replace="_nav :: nav"/>
+
+<main role="main" class="container" style="padding-top: 50px;">
+
+  <div id="at-first" class="card mt-5 shadow rounded">
+    <div class="card-header">
+      <h5>はじめに</h5>
+    </div>
+    <div class="card-body">
+      <p class="card-text">
+        このWebアプリでは、FIDO認証における認証を体験する。<br>
+        なお、事前に<a href="/webauthn/register"><strong>ココ</strong></a>にて登録処理を実施していないと正常に処理されない。<br>
+        ちなみに、本来であればボタン1回押下と認証ダイアログへの対応を行えばよいところを、<br>
+        処理内部のパラメータ確認のため、あえてボタンを複数回押して頂くようにしている。<br>
+        <br>
+      </p>
+    </div>
+  </div>
+
+  <div id="webauthn-register-request" class="card mt-5 shadow rounded">
+    <div class="card-header">
+      <h5>1. FIDO認証用情報を要求（ブラウザから認証サーバへ）</h5>
+    </div>
+    <div class="card-body">
+      <p class="card-text">認証サーバへFIDO認証用情報を要求し、チャレンジ等の情報を要求する。</p>
+      <div class="card p-3 shadow">
+        <form action="#">
+          <label class="control-label" for="email">Email </label>
+          <input id="email" type="email" class="form-control" placeholder="you@example.com"
+                 value="test@test.test"/>
+          <div id="emailValidationMessage"></div>
+          <button id="webauthn-register-request-btn" class="btn btn-primary mt-3" type="submit">
+            FIDO認証情報要求
+          </button>
+        </form>
+      </div>
+      <div class="card mt-3 p-3 shadow">
+        <div class="form-group">
+          <label for="webauthn-register-response">レスポンス</label>
+          <textarea class="form-control auto-resize" id="webauthn-register-response" rows="3"
+                    readonly></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="webauthn-register-response-container">
+    <input id="webauthn-register-response-json-raw" type="hidden"/>
+    <input id="cred-api-call-result-json-raw" type="hidden"/>
+  </div>
+
+  <div id="cred-parameter-create" class="card mt-5 shadow rounded">
+    <div class="card-header">
+      <h5>2. 認証機との処理に使用するパラメータの作成</h5>
+    </div>
+    <div class="card-body">
+      <p class="card-text">認証サーバから取得したデータを元にnavigator.credentials.create()呼び出しに必要なパラメータを作成する。</p>
+      <div class="card p-3 shadow">
+        <form action="#">
+          <button id="cred-parameter-create-btn" class="btn btn-primary mt-2" type="submit">
+            認証機パラメータ作成
+          </button>
+        </form>
+      </div>
+      <div class="card mt-3 p-3 shadow">
+        <div class="form-group">
+          <label for="cred-parameter-create-result">結果</label>
+          <textarea class="form-control auto-resize" id="cred-parameter-create-result" rows="3"
+                    readonly></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="cred-api-call" class="card mt-5 shadow rounded">
+    <div class="card-header">
+      <h5>3. navigator.credentials.create()呼び出し</h5>
+    </div>
+    <div class="card-body">
+      <p class="card-text">
+        ブラウザから認証機へアクセスするためのブラウザAPI（navigator.credentials.create()）を呼び出し、そのレスポンスを受け取る。</p>
+      <div class="card p-3 shadow">
+        <form action="#">
+          <button id="cred-api-call-btn" class="btn btn-primary mt-2" type="submit">
+            ブラウザAPI実行
+          </button>
+        </form>
+      </div>
+      <div class="card mt-3 p-3 shadow">
+        <div class="form-group">
+          <label for="cred-api-call-result">ブラウザAPI返却レスポンス ※ほぼそのまま認証サーバへ送信するもの</label>
+          <textarea class="form-control auto-resize" id="cred-api-call-result" rows="3"
+                    readonly></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="public-credential-register-request" class="card mt-5 my-5 shadow rounded">
+    <div class="card-header">
+      <h5>4. 認証情報（公開鍵）登録を要求（ブラウザから認証サーバへ）</h5>
+    </div>
+    <div class="card-body">
+      <p class="card-text">
+        認証情報（公開鍵等）を送信する。<br>
+        ※認証サーバでは下記が行われたあと、認証情報を登録する。<br>
+        　・送信したchallengeがサーバで生成されたchallengeと一致するか？<br>
+        　・送信したoriginが期待するoriginと一致するか？<br>
+        　・送信したattestationObjectが妥当かどうか？</p>
+      <div class="card p-3 shadow">
+        <form action="#">
+          <button id="public-credential-register-request-btn" class="btn btn-primary mt-2"
+                  type="submit">
+            認証情報登録要求
+          </button>
+        </form>
+      </div>
+      <div class="card mt-3 p-3 shadow">
+        <div class="form-group">
+          <label for="public-credential-register-request-result">実行結果</label>
+          <textarea class="form-control auto-resize" id="public-credential-register-request-result"
+                    rows="3" readonly></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<th:block th:replace="_include :: basic"/>
+</body>
+</html>

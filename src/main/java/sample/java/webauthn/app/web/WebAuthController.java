@@ -14,4 +14,9 @@ public class WebAuthController {
   public String register(Model model) {
     return "webAuthRegister";
   }
+
+  @GetMapping("authenticate")
+  public String authenticate(Model model) {
+    return "webAuthAuthenticate";
+  }
 }
