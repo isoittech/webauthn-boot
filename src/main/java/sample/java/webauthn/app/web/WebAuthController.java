@@ -15,8 +15,8 @@ public class WebAuthController {
     return "webAuthRegister";
   }
 
-  @GetMapping("authenticate")
-  public String authenticate(Model model) {
-    return "webAuthAuthenticate";
+  @GetMapping("login")
+  public String login(Model model) {
+    return "webAuthLogin";
   }
 }

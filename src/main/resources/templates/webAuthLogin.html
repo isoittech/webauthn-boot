@@ -24,7 +24,7 @@
     </div>
   </div>
 
-  <div id="webauthn-register-request" class="card mt-5 shadow rounded">
+  <div id="webauthn-login-request" class="card mt-5 shadow rounded">
     <div class="card-header">
       <h5>1. FIDO認証用情報を要求（ブラウザから認証サーバへ）</h5>
     </div>
@@ -36,23 +36,23 @@
           <input id="email" type="email" class="form-control" placeholder="you@example.com"
                  value="test@test.test"/>
           <div id="emailValidationMessage"></div>
-          <button id="webauthn-register-request-btn" class="btn btn-primary mt-3" type="submit">
+          <button id="webauthn-login-request-btn" class="btn btn-primary mt-3" type="submit">
             FIDO認証情報要求
           </button>
         </form>
       </div>
       <div class="card mt-3 p-3 shadow">
         <div class="form-group">
-          <label for="webauthn-register-response">レスポンス</label>
-          <textarea class="form-control auto-resize" id="webauthn-register-response" rows="3"
+          <label for="webauthn-login-response">レスポンス</label>
+          <textarea class="form-control auto-resize" id="webauthn-login-response" rows="3"
                     readonly></textarea>
         </div>
       </div>
     </div>
   </div>
 
-  <div id="webauthn-register-response-container">
-    <input id="webauthn-register-response-json-raw" type="hidden"/>
+  <div id="webauthn-login-response-container">
+    <input id="webauthn-login-response-json-raw" type="hidden"/>
     <input id="cred-api-call-result-json-raw" type="hidden"/>
   </div>
 
@@ -105,7 +105,7 @@
   </div>
 
 
-  <div id="public-credential-register-request" class="card mt-5 my-5 shadow rounded">
+  <div id="public-credential-login-request" class="card mt-5 my-5 shadow rounded">
     <div class="card-header">
       <h5>4. 認証情報（公開鍵）登録を要求（ブラウザから認証サーバへ）</h5>
     </div>
@@ -118,7 +118,7 @@
         　・送信したattestationObjectが妥当かどうか？</p>
       <div class="card p-3 shadow">
         <form action="#">
-          <button id="public-credential-register-request-btn" class="btn btn-primary mt-2"
+          <button id="public-credential-login-request-btn" class="btn btn-primary mt-2"
                   type="submit">
             認証情報登録要求
           </button>
@@ -126,8 +126,8 @@
       </div>
       <div class="card mt-3 p-3 shadow">
         <div class="form-group">
-          <label for="public-credential-register-request-result">実行結果</label>
-          <textarea class="form-control auto-resize" id="public-credential-register-request-result"
+          <label for="public-credential-login-request-result">実行結果</label>
+          <textarea class="form-control auto-resize" id="public-credential-login-request-result"
                     rows="3" readonly></textarea>
         </div>
       </div>
