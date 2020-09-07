@@ -22,7 +22,7 @@ import lombok.ToString;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserCreationOptions implements Serializable {
+public class UserEntity implements Serializable {
 
   @JsonProperty("id")
   public Integer id;
@@ -57,7 +57,7 @@ public class UserCreationOptions implements Serializable {
     this.additionalProperties.put(name, value);
   }
 
-  public UserCreationOptions withAdditionalProperty(String name, Object value) {
+  public UserEntity withAdditionalProperty(String name, Object value) {
     this.additionalProperties.put(name, value);
     return this;
   }

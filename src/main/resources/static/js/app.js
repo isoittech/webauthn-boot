@@ -32,6 +32,11 @@ function binaryToBase64(binaryObj){
 }
 
 
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+// onLoad処理
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
 $(function(){
   console.log("≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡")
   console.log("onLoad処理開始")
@@ -44,25 +49,27 @@ $(function(){
 // ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
   $("#webauthn-register-request-btn").on('click',function(){
     axios.post('/webauthn/register', {
-      email: $("input#email").val()
-    },
-    {
-      headers: {
-        'Content-Type': 'application/json'
+        email: $("input#email").val()
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
       }
-    })
-    .then(function (response) {
+    ).then(function (response) {
       console.log(response.data.data);
       $("#webauthn-register-response-json-raw").val(JSON.stringify(response.data.data));
       var textareaVal = JSON.stringify(response.data.data, null , "\t");
       $("#webauthn-register-response").val(textareaVal);
 
-    })
-    .catch(function (error) {
+    }).catch(function (error) {
       console.log(error);
-      $("#webauthn-register-response").val("NG");
-    })
-    .finally(function () {
+      if(error.response.data.message) {
+        $("#webauthn-register-response").val("【ERROR】\n" + error.response.data.message);
+      } else {
+        $("#webauthn-register-response").val("【ERROR】\n原因不明のエラーです");
+      }
+    }).finally(function () {
       console.log("finally");
     });
 
@@ -80,9 +87,6 @@ $(function(){
     // ==========================================================
     //  認証機との処理に使用するパラメータの作成
     // ==========================================================
-    // TODO
-    // Windows Helloを認証機として使う場合の考慮事項
-    // https://docs.microsoft.com/ja-jp/microsoft-edge/dev-guide/windows-integration/web-authentication#windows-hello-%E3%81%AE%E7%89%B9%E5%88%A5%E3%81%AA%E8%80%83%E6%85%AE%E4%BA%8B%E6%96%87
     var publicKeyCredentialCreationOptions = {
         challenge: base64ToBinary(fidoAuthResp.challenge),
         challenge_base64: fidoAuthResp.challenge + " ★これをバイナリにしたのが'challenge'",
@@ -143,9 +147,8 @@ $(function(){
     // ==========================================================
     navigator.credentials.create({
         publicKey: publicKeyCredentialCreationOptions_grobal
-    })
-    .then((result) => {
-      var attestationObject_grobal = result;
+    }).then((result) => {
+      attestationObject_grobal = result;
       console.log(attestationObject_grobal);
 
       // ---------------------------------
@@ -165,11 +168,55 @@ $(function(){
 
       var textareaVal = JSON.stringify(attestationObject, null , "\t");
       $("#cred-api-call-result").val(textareaVal);
-    })
-    .catch((errorObj) => {
+    }).catch((errorObj) => {
       console.log(errorObj);
       $("#cred-api-call-result").val("エラー発生");
     });
+
+    return false;
+  });
+
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+// 認証情報（公開鍵）登録を要求（ブラウザから認証サーバへ）
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+  $("#public-credential-register-request-btn").on('click',function(){
+    // ==========================================================
+    //  認証サーバへ送信するパラメータを作成する
+    // ==========================================================
+    var attestationObject = {
+      id: attestationObject_grobal.id,
+      rawId: binaryToBase64(attestationObject_grobal.rawId),
+      response: {
+        attestationObject: binaryToBase64(attestationObject_grobal.response.attestationObject),
+        clientDataJSON: binaryToBase64(attestationObject_grobal.response.clientDataJSON),
+      },
+      type: attestationObject_grobal.type,
+      email: $("input#email").val()
+    };
+
+    // ==========================================================
+    //  認証サーバへ送信する
+    // ==========================================================
+    axios.post('/webauthn/credential', attestationObject, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      observe: 'response'
+    }).then(function (response) {
+      console.log(response.data.data);
+      var textareaVal = JSON.stringify(response.data.data, null , "\t");
+      $("#public-credential-register-request-result").val(textareaVal);
+    }).catch(function (error) {
+      console.log(error);
+      if(error.response.data.message) {
+        $("#public-credential-register-request-result").val("【ERROR】\n" + error.response.data.message);
+      } else {
+        $("#public-credential-register-request-result").val("【ERROR】\n原因不明のエラーです");
+      }
+    }).finally(function () {
+      console.log("finally");
+    });
+
 
     return false;
   });

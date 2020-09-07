@@ -30,36 +30,48 @@ dependencies {
     // BOM
     implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
 
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    // Spring, Spring Boot
+    implementation('org.springframework.boot:spring-boot-starter-thymeleaf')
+    implementation('org.springframework.boot:spring-boot-starter-web')
     implementation('org.springframework.security:spring-security-core')
+    implementation('org.mybatis.spring.boot:mybatis-spring-boot-starter:2.1.3')
+
+    
+    // DB
+    implementation('org.flywaydb:flyway-core')
+    runtimeOnly('com.h2database:h2')
 
 
-    implementation("com.webauthn4j:webauthn4j-util:$webauthn4jVersion")
-    implementation("com.webauthn4j:webauthn4j-core:$webauthn4jVersion")
-    implementation("com.webauthn4j:webauthn4j-metadata:$webauthn4jVersion")
-    implementation("org.hibernate:hibernate-validator:$hibernateValidatorVersion")
-    implementation("org.thymeleaf:thymeleaf-testing:$thymeleafVersion")
-    implementation("org.modelmapper:modelmapper:$modelMapperVersion")
+    // Log, Validation, Lombok
     implementation("org.lazyluke:log4jdbc-remix:$log4jdbcVersion")
     implementation("org.slf4j:jcl-over-slf4j")
     implementation('javax.validation:validation-api')
+    implementation("org.hibernate:hibernate-validator:$hibernateValidatorVersion")
     implementation('org.hibernate.validator:hibernate-validator-annotation-processor')
     implementation('javax.el:javax.el-api:3.0.0')
     implementation('javax.servlet:javax.servlet-api')
     implementation('org.glassfish.web:javax.el:2.2.6')
+    compileOnly('org.projectlombok:lombok')
+    annotationProcessor('org.projectlombok:lombok')
+
+
+    // Webauthn4J
+    implementation("com.webauthn4j:webauthn4j-util:$webauthn4jVersion")
+    implementation("com.webauthn4j:webauthn4j-core:$webauthn4jVersion")
+    implementation("com.webauthn4j:webauthn4j-metadata:$webauthn4jVersion")
+
+
+    // Other
+    implementation("org.modelmapper:modelmapper:$modelMapperVersion")
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor")
-    implementation('org.mybatis.spring.boot:mybatis-spring-boot-starter:2.1.3')
-    implementation('org.flywaydb:flyway-core')
-    implementation('commons-codec:commons-codec:1.15')
     implementation('javax.xml.bind:jaxb-api:2.3.1')
-
-
+    implementation('commons-codec:commons-codec:1.15')
     developmentOnly('org.springframework.boot:spring-boot-devtools')
-    compileOnly('org.projectlombok:lombok')
-    runtimeOnly('com.h2database:h2')
-    annotationProcessor('org.projectlombok:lombok')
+
+
+    // Test
+    implementation("org.thymeleaf:thymeleaf-testing:$thymeleafVersion")
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }

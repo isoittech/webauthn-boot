@@ -1,10 +1,10 @@
 .rightBottomFixed{
-    position:fixed;
-    right:0px;
-    bottom:10px;
-    transition:1s;
-    opacity:0.7;
+    position: fixed;
+    right: 0px;
+    bottom: 0px;
+    transition: 1s;
+    opacity: 0.7;
 }
 .rightBottomFixed:hover{
-    opacity:1;
+    opacity: 1;
 }

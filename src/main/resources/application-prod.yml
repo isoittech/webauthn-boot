@@ -8,6 +8,13 @@ spring:
       enabled: true
       path: /h2-console
 
+app:
+  fido:
+    origin: https://webauthn-boot.herokuapp.com
+    rp:
+      id: webauthn-boot.heroku.
+      name: FidoSampleApp
+
 logging.file: webauthn.log
 logging:
   file:

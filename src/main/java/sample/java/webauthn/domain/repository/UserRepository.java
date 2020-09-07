@@ -4,8 +4,11 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
-import sample.java.webauthn.domain.entity.UserCreationOptions;
+import org.apache.ibatis.annotations.Update;
+import sample.java.webauthn.domain.entity.UserEntity;
 
 @Mapper
 public interface UserRepository {
@@ -34,5 +37,28 @@ public interface UserRepository {
           + "  , #{user.attestation}"
           + ")")
   @Options(useGeneratedKeys = true, keyProperty = "id")
-  void save(@Param("user") UserCreationOptions user);
+  void save(@Param("user") UserEntity user);
+
+  @Select("SELECT * FROM m_user WHERE email = #{email}")
+  @Results(
+      id = "allUserEntity",
+      value = {
+        @Result(column = "user_id", property = "fidoUser.id"),
+        @Result(column = "name", property = "fidoUser.name"),
+        @Result(column = "display_name", property = "fidoUser.displayName"),
+        @Result(column = "email", property = "email"),
+        @Result(column = "challenge", property = "challenge"),
+        @Result(column = "rp_name", property = "rp.name"),
+        @Result(column = "attestation", property = "attestation")
+      })
+  UserEntity findByEmail(String email);
+
+  @Update(
+      "UPDATE "
+          + "m_user "
+          + "SET"
+          + " authenticator = #{authenticatorBase64}"
+          + "WHERE"
+          + " email = #{userEmail}")
+  int saveAuthenticator(String userEmail, String authenticatorBase64);
 }

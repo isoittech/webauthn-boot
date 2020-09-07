@@ -8,13 +8,22 @@
 <th:block th:replace="_nav :: nav"/>
 
 <main role="main" class="container" style="padding-top: 50px;">
-  <div class="py-5 text-center">
-    <p th:if="${validationError}" class="alert alert-danger text-left" th:text="${validationError}">
-      validation
-      error</p>
+
+  <div id="at-first" class="card mt-5 shadow rounded">
+    <div class="card-header">
+      <h5>はじめに</h5>
+    </div>
+    <div class="card-body">
+      <p class="card-text">
+        このWebアプリでは、FIDO認証における登録を体験する。<br>
+        ちなみに、本来であればボタン1回押下と認証ダイアログへの対応を行えばよいところを、<br>
+        処理内部のパラメータ確認のため、あえてボタンを複数回押して頂くようにしている。<br>
+        <br>
+      </p>
+    </div>
   </div>
 
-  <div id="webauthn-register-request" class="card shadow rounded">
+  <div id="webauthn-register-request" class="card mt-5 shadow rounded">
     <div class="card-header">
       <h5>1. FIDO認証用情報を要求（ブラウザから認証サーバへ）</h5>
     </div>
@@ -86,9 +95,39 @@
       </div>
       <div class="card mt-3 p-3 shadow">
         <div class="form-group">
-          <label for="cred-api-call-result">ブラウザAPI返却レスポンス</label>
+          <label for="cred-api-call-result">ブラウザAPI返却レスポンス ※ほぼそのまま認証サーバへ送信するもの</label>
           <textarea class="form-control auto-resize" id="cred-api-call-result" rows="3"
                     readonly></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="public-credential-register-request" class="card mt-5 my-5 shadow rounded">
+    <div class="card-header">
+      <h5>4. 認証情報（公開鍵）登録を要求（ブラウザから認証サーバへ）</h5>
+    </div>
+    <div class="card-body">
+      <p class="card-text">
+        認証情報（公開鍵等）を送信する。<br>
+        ※認証サーバでは下記が行われたあと、認証情報を登録する。<br>
+        　・送信したchallengeがサーバで生成されたchallengeと一致するか？<br>
+        　・送信したoriginが期待するoriginと一致するか？<br>
+        　・送信したattestationObjectが妥当かどうか？</p>
+      <div class="card p-3 shadow">
+        <form action="#">
+          <button id="public-credential-register-request-btn" class="btn btn-primary mt-2"
+                  type="submit">
+            認証情報登録要求
+          </button>
+        </form>
+      </div>
+      <div class="card mt-3 p-3 shadow">
+        <div class="form-group">
+          <label for="public-credential-register-request-result">実行結果</label>
+          <textarea class="form-control auto-resize" id="public-credential-register-request-result"
+                    rows="3" readonly></textarea>
         </div>
       </div>
     </div>
