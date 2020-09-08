@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("webauthn")
 @Slf4j
 public class WebAuthController {
+  @GetMapping("/")
+  public String index(Model model) {
+    return "redirect:/webauthn/register";
+  }
+
   @GetMapping("register")
   public String register(Model model) {
     return "webAuthRegister";
