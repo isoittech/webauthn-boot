@@ -19,7 +19,7 @@
 <configuration>
   <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
   <property name="LOG_FILE"
-    value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}}/spring.log}"/>
+    value="log/webauthn-boot.log"/>
   <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
   <include resource="org/springframework/boot/logging/logback/file-appender.xml"/>
   <root level="INFO">
