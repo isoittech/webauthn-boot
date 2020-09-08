@@ -12,7 +12,7 @@ app:
   fido:
     origin: https://webauthn-boot.herokuapp.com
     rp:
-      id: webauthn-boot.heroku.
+      id: webauthn-boot.herokuapp.com
       name: FidoSampleApp
 
 logging.file: webauthn.log
