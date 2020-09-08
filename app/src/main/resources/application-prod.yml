@@ -12,9 +12,9 @@ spring:
 
 app:
   fido:
-    origin: https://webauthn-boot.herokuapp.com
+    origin: https://webauthn-boot.0g0.jp
     rp:
-      id: webauthn-boot.herokuapp.com
+      id: webauthn-boot.0g0.jp
       name: FidoSampleApp
 
 logging.file: webauthn.log

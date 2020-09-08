@@ -1,0 +1,61 @@
+:toc:
+:sectnums:
+
+= Nginx, SSL有効化, 独自ドメイン
+
+== 概要
+
+. ドメイン取得
+. 資材アップロード
+. MyDNSへのIPアドレス通知
+. Nginx起動
+
+== 詳細
+
+=== ドメイン取得
+
+[%hardbreaks]
+. MyDNSでドメインを取得する。
++
+https://www.mydns.jp/
++
+.. ここでMasterIDを取得する。
++
+.. 「DOMAIN INFO」ページの `Domain* : (FQDN)` に取得希望ドメイン名を入力する。
+.. 同ページの `Hostname*, Type*, Content, Delegateid or your id. (Hostname is not FQDN)` にも同じ値を入力する。
+.. そして `CHECK` クリック。
+
+. MasterIDに紐づく子IDを取得し、上記で取得したドメインのサブドメインを取得することができる。
+.. 子IDは、MasterIDのアカウントの `USER INFO` から、 `子ID関連` の `追加する子IDの数` にて必要な数を選択し、 `CHECK` をクリックする。
+.. MasterIDの「DOMAIN INFO」ページで、 `Hostname*, Type*, Content, Delegateid or your id. (Hostname is not FQDN)` の左端の入力欄にサブドメイン識別子だけ入力する。 +
+例：MasterIDで登録したドメインがXXX.OxO.jpだとすると、YYY.XXX.OxO.jpというサブドメインを取得したい場合、 `YYY` だけ入力する。
+
+=== Nginx資材編集、アップロード
+
+. 取得したドメインで編集
+. 本フォルダの内容をアップロードする
+
+=== MyDNSへのIPアドレス通知
+. crontabを仕掛け、MyDNSへのIPアドレス通知をcron化する。まずこれをやり、IPアドレスをMyDNSに通知しないと、LetsEncryptのCertbotがエラー終了するので注意。
++
+```
+crontab -e
+*/5 * * * * /usr/bin/wget -O - 'https://mydnsXXXXXX:PWPWPWPWPW@www.mydns.jp/login.html'  >>/tmp/cronlog.log 2>>/tmp/cronlog-err.log
+```
+
+=== Nginx起動
+. Nginxコンテナを有効化
++
+```
+$ cd <nginx>
+
+# 初めて起動
+$ docker-compose --env-file docker-compose.***.env build
+$ docker-compose --env-file docker-compose.***.env up -d
+$ docker-compose --env-file docker-compose.***.env logs     # ログ確認
+$ docker-compose exec nginx /bin/bash           # ログインして確認
+
+# 再起動
+$ docker-compose --env-file docker-compose.***.env restart
+
+```

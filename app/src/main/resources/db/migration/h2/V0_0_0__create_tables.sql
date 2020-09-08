@@ -8,6 +8,6 @@ CREATE TABLE m_user (
   rp_name VARCHAR(64) NOT NULL,
   user_id VARCHAR(64) NOT NULL,
   attestation VARCHAR(64) NOT NULL,
-  authenticator VARCHAR(10240),
+  authenticator VARCHAR(102400),
   primary key(id)
 );

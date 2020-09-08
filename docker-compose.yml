@@ -1,0 +1,46 @@
+version: '3.7'
+
+services:
+  #############################################
+  # Appサーバ
+  #############################################
+  app:
+    container_name: app
+    build:
+      context: ./app
+    expose:
+      - 8181
+    volumes:
+      - ./app:/opt/app
+
+    working_dir: /opt/app
+    command: >
+      sh -c '
+        export SPRING_PROFILES_ACTIVE=prod
+        java -jar build/libs/webauthn-boot-0.0.1-SNAPSHOT.jar
+      '
+
+  #############################################
+  # Webサーバ
+  #############################################
+  nginx:
+    container_name: nginx
+    build:
+      context: ./nginx
+    environment:
+      TZ: Asia/Tokyo
+      LETSENCRYPT_HOSTS: webauthn-boot.0g0.jp
+      LETSENCRYPT_MAIL: webauthn-boot@gmail.com
+      LETSENCRYPT_SUBJECT: "/C=JP/ST=Tokyo/L=Shinagawa/CN=default"
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - app
+    volumes:
+      # nginx.conf
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      # log directory
+      - /var/log/nginx:/var/log/nginx
+      # document root directory
+      - /opt/app/webauthn-boot/app:/opt/app
