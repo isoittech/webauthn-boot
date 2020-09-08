@@ -16,6 +16,7 @@ import com.webauthn4j.server.ServerProperty;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -29,11 +30,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sample.java.webauthn.domain.dto.AllowCredential;
 import sample.java.webauthn.domain.dto.CreateUserDto;
+import sample.java.webauthn.domain.dto.FidoUser;
+import sample.java.webauthn.domain.dto.LoginUserDto;
+import sample.java.webauthn.domain.dto.Rp;
+import sample.java.webauthn.domain.dto.UserAuthenticationOption;
+import sample.java.webauthn.domain.dto.UserEntity;
 import sample.java.webauthn.domain.dto.ValidateCredentialDto;
-import sample.java.webauthn.domain.entity.FidoUser;
-import sample.java.webauthn.domain.entity.Rp;
-import sample.java.webauthn.domain.entity.UserEntity;
 import sample.java.webauthn.domain.exception.UserException;
 import sample.java.webauthn.domain.repository.UserRepository;
 import sample.java.webauthn.domain.util.UuidUtil;
@@ -76,7 +80,7 @@ public class WebauthnServiceImpl implements WebauthnService {
     String userId = DatatypeConverter.printBase64Binary(UuidUtil.asBytes(userIdUuid));
 
     // UserCreationOptionsのパラメータを組み立てる
-    Rp rp = new Rp().builder().name(rpName).build();
+    Rp rp = new Rp().builder().name(rpName).id(rpId).build();
 
     FidoUser user =
         new FidoUser()
@@ -120,6 +124,72 @@ public class WebauthnServiceImpl implements WebauthnService {
       e.printStackTrace();
     }
     return validateResult;
+  }
+
+  @Override
+  public UserAuthenticationOption createUserAuthenticationOption(LoginUserDto loginUserDto) {
+    // ================================================================
+    // ユーザが登録済みかどうかチェックする
+    // ================================================================
+    UserEntity userEntity = userRepository.findByEmail(loginUserDto.getEmail());
+    if (userEntity == null) {
+      throw new UserException("当該のE-mailアドレスは登録されておりません。");
+    }
+
+    // ================================================================
+    // 新規でchallengeを生成する
+    // ================================================================
+    Challenge challengeRaw = new DefaultChallenge(); // Webauthn4J
+    String challenge = DatatypeConverter.printBase64Binary(challengeRaw.getValue());
+
+    // ================================================================
+    // 新規に生成したchallengeをDBに保存する
+    // ================================================================
+    saveChallenge(loginUserDto.getEmail(), challenge);
+
+    // ================================================================
+    // DBに保存されている公開鍵、challngeを使用して、レスポンス用のパラメータを組み立てる
+    // ================================================================
+
+    // 例えばWindows Helloを認証機として使う場合、
+    // internal「だけ」が下記変数transportsにListの要素として指定されていないとだめのようである。
+    // 適用させたい順番があるのかと考え、internalを最初に持ってきてもだめだった。
+    //    List<String> transports = new ArrayList<>(Arrays.asList("usb", "nfc", "ble", "internal"));
+    //    List<String> transports = new ArrayList<>(Arrays.asList("internal", "usb", "nfc", "ble"));
+    List<String> transports = new ArrayList<>(Arrays.asList("internal"));
+
+    AllowCredential allowCredential =
+        new AllowCredential()
+            .builder()
+            .type("public-key")
+            .id(userEntity.getFidoUser().getId())
+            .transports(transports)
+            .build();
+    List<AllowCredential> allowCredentials = new ArrayList<>(Arrays.asList(allowCredential));
+    UserAuthenticationOption retObj =
+        new UserAuthenticationOption()
+            .builder()
+            .challenge(challenge)
+            .allowCredentials(allowCredentials)
+            .build();
+
+    return retObj;
+  }
+
+  /**
+   * challengeをDBに保存する
+   *
+   * @param email
+   * @param challengeBase64
+   */
+  private void saveChallenge(String email, String challengeBase64) {
+    // -------------------------------------
+    // 保存
+    // -------------------------------------
+    int count = userRepository.saveChallenge(email, challengeBase64);
+    if (count == 0) {
+      throw new UserException("認証情報（チャレンジ）の保存に失敗しました。");
+    }
   }
 
   /**
@@ -233,7 +303,7 @@ public class WebauthnServiceImpl implements WebauthnService {
    */
   private void saveUser(UserEntity userEntity) {
     // ユーザが保存済みがどうか確認する
-    int userCount = userRepository.countByEmail(userEntity.email);
+    int userCount = userRepository.countByEmail(userEntity.getEmail());
     if (userCount != 0) {
       throw new UserException("このE-mailアドレスは既に登録されています。");
     }

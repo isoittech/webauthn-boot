@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-import sample.java.webauthn.domain.entity.UserEntity;
+import sample.java.webauthn.domain.dto.UserEntity;
 
 @Mapper
 public interface UserRepository {
@@ -59,6 +59,15 @@ public interface UserRepository {
           + "SET"
           + " authenticator = #{authenticatorBase64}"
           + "WHERE"
-          + " email = #{userEmail}")
-  int saveAuthenticator(String userEmail, String authenticatorBase64);
+          + " email = #{email}")
+  int saveAuthenticator(String email, String authenticatorBase64);
+
+  @Update(
+      "UPDATE "
+          + "m_user "
+          + "SET"
+          + " challenge = #{challengeBase64}"
+          + "WHERE"
+          + " email = #{email}")
+  int saveChallenge(String email, String challengeBase64);
 }

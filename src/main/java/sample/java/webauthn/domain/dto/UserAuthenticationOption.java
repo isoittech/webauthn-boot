@@ -1,14 +1,15 @@
-package sample.java.webauthn.domain.entity;
+package sample.java.webauthn.domain.dto;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,36 +17,22 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"email", "challenge", "rp", "user", "attestation"})
+@JsonPropertyOrder({"challenge", "allowCredentials"})
 @ToString
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserEntity implements Serializable {
-
-  @JsonProperty("id")
-  public Integer id;
-
-  @JsonProperty("email")
-  public String email;
+public class UserAuthenticationOption implements Serializable {
 
   @JsonProperty("challenge")
-  public String challenge;
+  private String challenge;
 
-  @JsonProperty("rp")
-  public Rp rp;
+  @JsonProperty("allowCredentials")
+  private List<AllowCredential> allowCredentials = null;
 
-  @JsonProperty("user")
-  public FidoUser fidoUser;
-
-  @JsonProperty("attestation")
-  public String attestation;
-
-  @JsonIgnore
-  private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
-
-  private static final long serialVersionUID = -2380232359442495568L;
+  @JsonIgnore private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+  private static final long serialVersionUID = 4111387191468716792L;
 
   @JsonAnyGetter
   public Map<String, Object> getAdditionalProperties() {
@@ -57,7 +44,7 @@ public class UserEntity implements Serializable {
     this.additionalProperties.put(name, value);
   }
 
-  public UserEntity withAdditionalProperty(String name, Object value) {
+  public UserAuthenticationOption withAdditionalProperty(String name, Object value) {
     this.additionalProperties.put(name, value);
     return this;
   }

@@ -1,4 +1,4 @@
-package sample.java.webauthn.domain.entity;
+package sample.java.webauthn.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -16,11 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-    "id",
-    "name",
-    "displayName"
-})
+@JsonPropertyOrder({"id", "name", "displayName"})
 @ToString
 @Data
 @Builder
@@ -29,14 +25,18 @@ import lombok.ToString;
 public class FidoUser implements Serializable {
 
   @JsonProperty("id")
-  public String id;
+  private String id;
+
   @JsonProperty("name")
-  public String name;
+  private String name;
+
   @JsonProperty("displayName")
-  public String displayName;
+  private String displayName;
+
   @JsonIgnore
   private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
-  private final static long serialVersionUID = 1254613525150473634L;
+
+  private static final long serialVersionUID = 1254613525150473634L;
 
   @JsonAnyGetter
   public Map<String, Object> getAdditionalProperties() {
@@ -52,5 +52,4 @@ public class FidoUser implements Serializable {
     this.additionalProperties.put(name, value);
     return this;
   }
-
 }

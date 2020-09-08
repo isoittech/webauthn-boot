@@ -4,8 +4,11 @@
 // ブラウザAPI（認証器に対する公開鍵の生成要求）に渡すパラメータ
 var publicKeyCredentialCreationOptions_grobal;
 // ブラウザAPI（認証器に対する公開鍵の生成要求）からの返却オブジェクト
-var attestationObject_grobal
-
+var attestationObject_grobal;
+// ブラウザAPI（認証器に対する公開鍵の取得要求）に渡すパラメータ
+var publicKeyCredentialRequestOptions_grobal;
+// ブラウザAPI（認証器に対する公開鍵の取得要求）からの返却オブジェクト
+var assertionResponse_grobal;
 
 // ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
 // FIDO認証情報リクエスト処理
@@ -45,10 +48,10 @@ $(function(){
 
 
 // ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
-// FIDO認証情報リクエスト処理
+// FIDO認証情報リクエスト処理（登録）
 // ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
   $("#webauthn-register-request-btn").on('click',function(){
-    axios.post('/webauthn/register', {
+    axios.post('/webauthn/register/parameter', {
         email: $("input#email").val()
       },
       {
@@ -77,7 +80,40 @@ $(function(){
   });
 
 // ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
-// 認証機との処理に使用するパラメータの作成処理
+// FIDO認証情報リクエスト処理（認証）
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+  $("#webauthn-login-request-btn").on('click',function(){
+    axios.post('/webauthn/login/parameter', {
+        email: $("input#email").val()
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    ).then(function (response) {
+      console.log(response.data.data);
+      $("#webauthn-login-response-json-raw").val(JSON.stringify(response.data.data));
+      var textareaVal = JSON.stringify(response.data.data, null , "\t");
+      $("#webauthn-login-response").val(textareaVal);
+
+    }).catch(function (error) {
+      console.log(error);
+      if(error.response.data.message) {
+        $("#webauthn-login-response").val("【ERROR】\n" + error.response.data.message);
+      } else {
+        $("#webauthn-login-response").val("【ERROR】\n原因不明のエラーです");
+      }
+    }).finally(function () {
+      console.log("finally");
+    });
+
+    return false;
+  });
+
+
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+// 認証機との処理に使用するパラメータの作成処理（登録編）
 // ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
   $("#cred-parameter-create-btn").on('click',function(){
     // hidden属性に保存してあったFIDO認証情報JSONを取得
@@ -89,39 +125,38 @@ $(function(){
     // ==========================================================
     var publicKeyCredentialCreationOptions = {
         challenge: base64ToBinary(fidoAuthResp.challenge),
-        challenge_base64: fidoAuthResp.challenge + " ★これをバイナリにしたのが'challenge'",
         rp: {
           name: fidoAuthResp.rp.name,
           id: fidoAuthResp.rp.id
         },
         user: {
           id: base64ToBinary(fidoAuthResp.user.id),
-          id_base64: fidoAuthResp.user.id + " ★これをバイナリにしたのが'user.id'",
           name: fidoAuthResp.user.name,
           displayName: fidoAuthResp.user.displayName,
         },
         attestation: fidoAuthResp.attestation,
         pubKeyCredParams: [
-          {
-            type: 'public-key',
-            alg: -7,
-          },
-          {
-            //Windows Hello supports the RS256 algorithm
-            type: "public-key",
-            alg: -257
-          }
+          { type: 'public-key', alg: -7 },
+          { type: 'public-key', alg: -35 },
+          { type: 'public-key', alg: -36 },
+          { type: 'public-key', alg: -257 }, //Windows Hello supports the RS256 algorithm
+          { type: 'public-key', alg: -258 },
+          { type: 'public-key', alg: -259 },
+          { type: 'public-key', alg: -37 },
+          { type: 'public-key', alg: -38 },
+          { type: 'public-key', alg: -39 },
+          { type: 'public-key', alg: -8 }
         ],
         authenticatorSelection: {
           // platform: 認証機器がクライアントに接続されており、通常は取り外し不可能である
           // cross-platform: 機器が異なるプラットフォームをまたがって使用される可能性があることを示す (USB や NFC 端末など)。
           authenticatorAttachment: 'platform',
+//          authenticatorAttachment: 'cross-platform',
           requireResidentKey: true, // 認証機にユーザ情報を保存するか否か
           userVerification: 'required' // required=ユーザ認証を行わせる
         }
     };
 
-    // ★重要★
     // $("#cred-parameter-create-result-json-raw").val(JSON.stringify(publicKeyCredentialCreationOptions));
     // 上記では、hiddenパラメータにブラウザAPIパラメータをJSON文字列にして保存している。
     // それを、ブラウザAPIに渡す直前に、JSON文字列からオブジェクトに戻しても、
@@ -133,6 +168,36 @@ $(function(){
     publicKeyCredentialCreationOptions_grobal = publicKeyCredentialCreationOptions;
     var textareaVal = JSON.stringify(publicKeyCredentialCreationOptions, null , "\t");
     $("#cred-parameter-create-result").val(textareaVal);
+
+    return false;
+  });
+
+
+
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+// 認証機との処理に使用するパラメータの作成処理（認証編）
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+  $("#login-cred-parameter-create-btn").on('click',function(){
+    // hidden属性に保存してあったFIDO認証情報JSONを取得
+    var fidoAuthResp = $("#webauthn-login-response-json-raw").val();
+    fidoAuthResp = JSON.parse(fidoAuthResp);
+
+    // ==========================================================
+    //  認証機との処理に使用するパラメータの作成
+    // ==========================================================
+    var publicKeyCredentialRequestOptions = {
+        challenge: base64ToBinary(fidoAuthResp.challenge),
+        allowCredentials: [{
+            id: base64ToBinary(fidoAuthResp.allowCredentials[0].id),
+            type: fidoAuthResp.allowCredentials[0].type,
+            transports: fidoAuthResp.allowCredentials[0].transports
+        }],
+        userVerification: 'required', // required=ユーザ認証を行わせる
+    };
+
+    publicKeyCredentialRequestOptions_grobal = publicKeyCredentialRequestOptions;
+    var textareaVal = JSON.stringify(publicKeyCredentialRequestOptions, null , "\t");
+    $("#login-cred-parameter-create-result").val(textareaVal);
 
     return false;
   });
@@ -170,7 +235,49 @@ $(function(){
       $("#cred-api-call-result").val(textareaVal);
     }).catch((errorObj) => {
       console.log(errorObj);
-      $("#cred-api-call-result").val("エラー発生");
+      var textareaVal = JSON.stringify(errorObj.message, null , "\t");
+      $("#cred-api-call-result").val("【ERROR】\n" + textareaVal);
+    });
+
+    return false;
+  });
+
+
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+// navigator.credentials.get()呼び出し
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+  $("#login-cred-api-call-btn").on('click',function(){
+    // ==========================================================
+    //  ブラウザAPIを実行（認証器に対して公開鍵の取得要求）
+    // ==========================================================
+    navigator.credentials.get({
+        publicKey: publicKeyCredentialRequestOptions_grobal
+    }).then((result) => {
+      assertionResponse_grobal = result;
+      console.log(assertionResponse_grobal);
+
+      // ---------------------------------
+      // Textareaフォームに表示したいためだけの処理
+      // ---------------------------------
+      var assertionResponse = "あとまわし";
+//      var assertionResponse = {
+//        PublicKeyCredential: {
+//          id: assertionResponse_grobal.id,
+//          rawId: binaryToBase64(assertionResponse_grobal.rawId)+ " ★実際はバイナリ",
+//          response: {
+//            assertionResponse: binaryToBase64(assertionResponse_grobal.response.assertionResponse)+ " ★実際はバイナリ",
+//            clientDataJSON: binaryToBase64(assertionResponse_grobal.response.clientDataJSON)+ " ★実際はバイナリ",
+//          },
+//          type: assertionResponse_grobal.type
+//        }
+//      };
+
+      var textareaVal = JSON.stringify(assertionResponse, null , "\t");
+      $("#login-cred-api-call-result").val(textareaVal);
+    }).catch((errorObj) => {
+      console.log(errorObj);
+      var textareaVal = JSON.stringify(errorObj.message, null , "\t");
+      $("#login-cred-api-call-result").val("【ERROR】\n" + textareaVal);
     });
 
     return false;
@@ -220,6 +327,53 @@ $(function(){
 
     return false;
   });
+
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+// ユーザ認証を要求（ブラウザから認証サーバへ）
+// ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
+  $("#public-credential-login-request-btn").on('click',function(){
+    // ==========================================================
+    //  認証サーバへ送信するパラメータを作成する
+    // ==========================================================
+    var attestationObject = {
+      rawId: binaryToBase64(assertionResponse_grobal.id),
+      response: {
+        authenticatorData: binaryToBase64(assertionResponse_grobal.response.authenticatorData),
+        signature: binaryToBase64(assertionResponse_grobal.response.signature),
+        clientDataJSON: binaryToBase64(assertionResponse_grobal.response.clientDataJSON),
+      },
+      id: assertionResponse_grobal.id,
+      type: assertionResponse_grobal.type,
+      email: $("input#email").val()
+     };
+
+    // ==========================================================
+    //  認証サーバへ送信する
+    // ==========================================================
+    axios.post('/webauthn/login', attestationObject, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      observe: 'response'
+    }).then(function (response) {
+      console.log(response.data.data);
+      var textareaVal = JSON.stringify(response.data.data, null , "\t");
+      $("#public-credential-login-request-result").val(textareaVal);
+    }).catch(function (error) {
+      console.log(error);
+      if(error.response.data.message) {
+        $("#public-credential-login-request-result").val("【ERROR】\n" + error.response.data.message);
+      } else {
+        $("#public-credential-login-request-result").val("【ERROR】\n原因不明のエラーです");
+      }
+    }).finally(function () {
+      console.log("finally");
+    });
+
+
+    return false;
+  });
+
 
 // ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡
 // テキストエリア自動拡張機能

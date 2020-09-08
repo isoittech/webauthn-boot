@@ -1,4 +1,4 @@
-package sample.java.webauthn.domain.entity;
+package sample.java.webauthn.domain.dto;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -25,10 +25,10 @@ import lombok.ToString;
 public class Rp implements Serializable {
 
   @JsonProperty("id")
-  public String id;
+  private String id;
 
   @JsonProperty("name")
-  public String name;
+  private String name;
 
   @JsonIgnore
   private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
