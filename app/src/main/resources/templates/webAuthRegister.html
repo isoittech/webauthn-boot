@@ -17,8 +17,8 @@
       <p class="card-text">
         このWebアプリでは、FIDO認証における登録を体験する。<br>
         ちなみに、本来であればボタン1回押下と認証ダイアログへの対応を行えばよいところを、<br>
-        処理内部のパラメータ確認のため、あえてボタンを複数回押して頂くようにしている。<br>
-        <br>
+        処理内部のパラメータ確認のため、あえてボタンを複数回押すようにしている。<br>
+        ※パラメータ確認不要or面倒な場合は「FIDO認証一気にやる」ボタンを押下する。<br>
       </p>
     </div>
   </div>
@@ -37,6 +37,10 @@
           <div id="emailValidationMessage"></div>
           <button id="webauthn-register-request-btn" class="btn btn-primary mt-3" type="submit">
             FIDO認証情報要求
+          </button>
+          <button id="webauthn-register-ikki-btn" class="btn btn-primary btn-outline-primary mt-3"
+                  type="submit">
+            FIDO認証一気にやる
           </button>
         </form>
       </div>
@@ -128,6 +132,7 @@
           <label for="public-credential-register-request-result">実行結果</label>
           <textarea class="form-control auto-resize" id="public-credential-register-request-result"
                     rows="3" readonly></textarea>
+          <a href="/webauthn/login" class="btn btn-outline-primary mt-2">ログイン画面へ</a>
         </div>
       </div>
     </div>
