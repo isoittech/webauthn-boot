@@ -62,6 +62,7 @@ public class WebauthnServiceImpl implements WebauthnService {
 
   private WebAuthnManager webAuthnManager = WebAuthnManager.createNonStrictWebAuthnManager();
 
+  @Override
   public UserEntity generateServerMakeCredRequest(CreateUserDto createUserDto) {
 
     // challenge
@@ -151,11 +152,12 @@ public class WebauthnServiceImpl implements WebauthnService {
     // DBに保存されている公開鍵、challngeを使用して、レスポンス用のパラメータを組み立てる
     // ================================================================
 
-    // 例えばWindows Helloを認証機として使う場合、
+    // ※Windows Helloを認証機として使う場合、
     // internal「だけ」が下記変数transportsにListの要素として指定されていないとだめのようである。
     // 適用させたい順番があるのかと考え、internalを最初に持ってきてもだめだった。
     //    List<String> transports = new ArrayList<>(Arrays.asList("usb", "nfc", "ble", "internal"));
     //    List<String> transports = new ArrayList<>(Arrays.asList("internal", "usb", "nfc", "ble"));
+    //    List<String> transports = new ArrayList<>(Arrays.asList("internal", "nfc", "ble"));
     List<String> transports = new ArrayList<>(Arrays.asList("internal"));
 
     AllowCredential allowCredential =
@@ -212,6 +214,9 @@ public class WebauthnServiceImpl implements WebauthnService {
         Base64.decodeBase64(validateCredentialDto.getResponse().getClientDataJSON());
     String userEmail = validateCredentialDto.getEmail();
     Set<String> transports = new HashSet<>(Arrays.asList("usb", "nfc", "ble", "internal"));
+    //    Set<String> transports = new HashSet<>(Arrays.asList("internal", "usb", "nfc", "ble"));
+    //    Set<String> transports = new HashSet<>(Arrays.asList("internal", "nfc", "ble"));
+    //    Set<String> transports = new HashSet<>(Arrays.asList("internal"));
 
     // --------------------------------------
     // Server properties
