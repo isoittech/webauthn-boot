@@ -3,6 +3,48 @@
 = webauthn-boot
 Demo project for Spring Boot with WebAuthn, MyBatis and Thymeleaf
 
+== 本アプリについて
+
+=== 内容
+
+FIDO認証のうちWebauthnを体験するもの。
+
+=== 開発背景
+
+FIDO認証について知識を深めるため。
+
+=== 実装状況
+[%hardbreaks]
+2020/09/10現在、完全に出来ていない。
+登録・認証（ログイン）のうち、認証工程の実装が完了していない。
+具体的には、 `navigator.credential.get()` というブラウザAPIを呼び出し、エンドユーザが認証操作（生体認証・PIN入力等）を行った結果、ブラウザAPIからエラーが返却される。
+エラー内容は `The operation either timed out or was not allowed. See: https://www.w3.org/TR/webauthn-2/#sctn-privacy-considerations-client.` である。
+
+== ビルド方法
+
+```shell
+$ cd app
+$ chmod 755 gradlew
+$ ./gradlew build -x test
+# --> app/build/libs/webauthn-boot-0.0.1-SNAPSHOT.jarが生成される
+```
+
+== 起動方法
+
+=== ローカル
+
+```shell
+$ cd app
+$ chmod 755 gradlew
+$ ./gradlew bootRun
+
+or
+
+$ cd app
+$ java -jar build/libs/webauthn-boot-0.0.1-SNAPSHOT.jar
+```
+
+
 == 参考
 
 === 開発系
